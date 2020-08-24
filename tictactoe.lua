@@ -7,9 +7,16 @@ grid = {
     {0, 0, 0}
 }
 
-function placeBlock(i, j, type)
-    commands.clone(circleLocation .. " " .. circleLocation .. " " .. string.format("~%d ~%d ~%d", i + 1, j, 1))
-    grid[i + 1][j + 1] = 1
+function placeBlock(i, j, playerNumber)
+    if playerNumber == 1 then
+        commands.clone(circleLocation .. " " .. circleLocation .. " " .. string.format("~%d ~%d ~%d", i + 1, j, 1))
+
+    else
+        commands.clone(crossLocation .. " " .. crossLocation .. " " .. string.format("~%d ~%d ~%d", i + 1, j, 1))
+
+    end
+
+    grid[i + 1][j + 1] = playerNumber
 end
 
 function checkVictory()
@@ -29,22 +36,6 @@ function checkVictory()
             return 0
         end
     end
-end
-
-function sumDiagonal(slope)
-    result = 0
-
-    for i = 1, 3
-    do
-        for j = 1, 3
-        do
-            if i == j then
-                result = result + grid[i][j]
-            end
-        end
-    end
-
-    return result
 end
 
 function sumRow(i)
@@ -69,8 +60,60 @@ function sumCollumn(j)
     return result
 end
 
-function clear() 
+function sumDiagonal(slope)
+    result = 0
 
+    for i = 1, 3
+    do
+        for j = 1, 3
+        do
+            if i == j then
+                result = result + grid[i][j]
+            end
+        end
+    end
+
+    return result
 end
 
-placeBlock(0, 0, 0)
+function clear() 
+    grid = {
+        {0, 0, 0},
+        {0, 0, 0},
+        {0, 0, 0}
+    }
+end
+
+function userInput(playerNumber)
+    print("Enter the i coordinate of your play: ")
+    local i = read()
+    print("Enter the j coordinate of your play: ")
+    local j = read()
+    print()
+
+    placeBlock(i, j, playerNumber)
+end
+
+counter = 1 
+
+while true do
+    local playerNumber = counter % 2
+
+    if playerNumber == 0 then
+        playerNumber = -1
+    end
+
+    userInput(playerNumber)
+    counter = counter + 1
+
+    local victory = checkVictory()
+
+    if victory == -1 then
+        print("Red wins!")
+        break
+
+    elseif victory == 1 then
+        print("Blue wins!")
+        break
+    end
+end
