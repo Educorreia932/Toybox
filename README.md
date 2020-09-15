@@ -1,2 +1,2 @@
-# Raspberry-Clock
-A simple Raspberry Pi clock
+# Raspberry Clock
+A simple Raspberry Pi clock made with Tkinter.
