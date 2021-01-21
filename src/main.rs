@@ -17,20 +17,20 @@ fn line(mut x0: i32, mut y0: i32, mut x1: i32, mut y1: i32, image: &mut RgbImage
         mem::swap(&mut y0, &mut y1);
     }
 
-    for x in x0..=x1 {
-        if x1 - x0 != 0 {
-            let t = (x - x0) / (x1 - x0);
-            let y = y0 * (1 - t) + y1 * t;
+    if x0 == x1 || x0 == 800 || y0 == 800 || x1 == 800 || y1 == 800 {
+        return;
+    }
 
-            if y < 800 && x < 800 {
-                if steep {
-                    (*image).put_pixel(y as u32, x as u32, color);
-                }
-        
-                else {
-                    (*image).put_pixel(x as u32, y as u32, color);
-                }
-            }
+    for x in x0..=x1 {
+        let t: f32 = (x - x0) as f32 / (x1 - x0) as f32;
+        let y: i32 = (y0 as f32 * (1.0 - t) + y1 as f32 * t) as i32;
+
+        if steep {
+            (*image).put_pixel(y as u32, x as u32, color);
+        }
+
+        else {
+            (*image).put_pixel(x as u32, y as u32, color);
         }
     }
 }
@@ -47,13 +47,12 @@ fn main() {
         for i in 0..3 {
             let v0 = model.verts.get(face[i] as usize).unwrap();
             let v1 = model.verts.get(face[(i + 1) % 3] as usize).unwrap();
-
+            
             let x0 = ((v0[0] + 1.0) * width as f32 / 2.0) as i32;
             let y0 = ((v0[1] + 1.0) * height as f32 / 2.0) as i32;
             let x1 = ((v1[0] + 1.0) * width as f32 / 2.0) as i32;
             let y1 = ((v1[1] + 1.0) * height as f32 / 2.0) as i32;
 
-            // println!("{} {} {} {}", x0, y0, x1, y1);
             line(x0, y0, x1, y1, &mut image, Rgb([255, 255, 255]));
         }
     }
