@@ -1,5 +1,7 @@
 use image::{RgbImage, Rgb, ImageBuffer};
+use image::imageops::{flip_vertical};
 use std::mem;
+mod model;
 
 fn line(mut x0: i32, mut y0: i32, mut x1: i32, mut y1: i32, image: &mut RgbImage, color: Rgb<u8>) {
     let mut steep = false;
@@ -44,10 +46,14 @@ fn main() {
     let width = 100;
     let height = 100;
 
+    let model = model::Model::from_file("obj/african_head.obj");
+
     let mut image : RgbImage = ImageBuffer::new(width, height);
 
     line(0, 0, 50, 50, &mut image, Rgb([255, 255, 255])); 
     line(0, 0, 10, 50, &mut image, Rgb([255, 0, 0])); 
 
+    image = flip_vertical(&image);
+    
     image.save("image.png").unwrap();
 }
