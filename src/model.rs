@@ -2,14 +2,14 @@ use std::fs::File;
 use std::io::{BufRead, BufReader};
 
 pub struct Model {
-    verts: Vec<Vec<f32>>,
-    faces: Vec<i32>,
+    pub verts: Vec<Vec<f32>>,
+    pub faces: Vec<Vec<i32>>,
 }
 
 impl Model {
     pub fn from_file(filename: &str) -> Self {
         let mut verts: Vec<Vec<f32>> = Vec::new();
-        let mut faces: Vec::<i32> = Vec::new();
+        let mut faces: Vec<Vec<i32>> = Vec::new();
 
         let file = File::open(filename).unwrap();
         let reader = BufReader::new(file);
@@ -26,10 +26,14 @@ impl Model {
                 }   
     
                 else if line[0..2].trim() == "f" {
-                    for face in line[2..].trim().split(' ') {
-                        let first: &str = face.split("/").collect::<Vec<&str>>()[0];
-                        faces.push(first.parse::<i32>().unwrap());
+                    let mut face = Vec::new();
+
+                    for f in line[2..].trim().split(' ') {
+                        let first: &str = f.split("/").collect::<Vec<&str>>()[0];
+                        face.push(first.parse::<i32>().unwrap() - 1);
                     }
+
+                    faces.push(face);
                 }
             }
         }
