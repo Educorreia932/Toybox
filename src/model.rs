@@ -1,15 +1,16 @@
 use std::fs::File;
 use std::io::{BufRead, BufReader};
+use nalgebra::{Vector3};
 
 pub struct Model {
-    pub verts: Vec<Vec<f32>>,
-    pub faces: Vec<Vec<i32>>,
+    pub verts: Vec<Vector3<f32>>,
+    pub faces: Vec<Vector3<i32>>,
 }
 
 impl Model {
     pub fn from_file(filename: &str) -> Self {
-        let mut verts: Vec<Vec<f32>> = Vec::new();
-        let mut faces: Vec<Vec<i32>> = Vec::new();
+        let mut verts: Vec<Vector3<f32>> = Vec::new();
+        let mut faces: Vec<Vector3<i32>> = Vec::new();
 
         let file = File::open(filename).unwrap();
         let reader = BufReader::new(file);
@@ -21,8 +22,9 @@ impl Model {
                 let s = line[0..2].trim();
 
                 if s == "v" {
-                    let line_verts = line[2..].trim().split(' ').flat_map(str::parse::<f32>).collect();
-                    verts.push(line_verts);
+                    let line_verts: Vec<f32> = line[2..].trim().split(' ').flat_map(str::parse::<f32>).collect();
+
+                    verts.push(Vector3::new(line_verts[0], line_verts[1], line_verts[2]));
                 }   
     
                 else if line[0..2].trim() == "f" {
@@ -33,7 +35,7 @@ impl Model {
                         face.push(first.parse::<i32>().unwrap() - 1);
                     }
 
-                    faces.push(face);
+                    faces.push(Vector3::new(face[0], face[1], face[2]));
                 }
             }
         }

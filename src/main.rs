@@ -1,7 +1,12 @@
 use image::{RgbImage, Rgb, ImageBuffer};
 use image::imageops::{flip_vertical};
+use nalgebra::{Vector2, Vector3};
 use std::mem;
 mod model;
+
+static red: Rgb<u8> = Rgb([255, 0, 0]);
+static white: Rgb<u8> = Rgb([255, 255, 255]);
+static green: Rgb<u8> = Rgb([0, 255, 0]);
 
 fn line(mut x0: i32, mut y0: i32, mut x1: i32, mut y1: i32, image: &mut RgbImage, color: Rgb<u8>) {
     let mut steep = false;
@@ -35,25 +40,42 @@ fn line(mut x0: i32, mut y0: i32, mut x1: i32, mut y1: i32, image: &mut RgbImage
     }
 }
 
-fn triangle(t0: &Vec<i32>, t1 : &Vec<i32>, t2: &Vec<i32>, image: &mut RgbImage, color: Rgb<u8>) {
-    line(t0[0], t0[1], t1[0], t1[1], image, color);
-    line(t1[0], t1[1], t2[0], t2[1], image, color);
-    line(t2[0], t2[1], t0[0], t0[1], image, color);
+fn triangle(mut t0: Vector2<i32>, mut t1: Vector2<i32>, mut t2: Vector2<i32>, image: &mut RgbImage, color: Rgb<u8>) {
+    // Sort coordinates
+
+    if t0.y > t1.y {
+        mem::swap(&mut t0, &mut t1);
+    }
+
+    if t0.y > t2.y {
+        mem::swap(&mut t0, &mut t2);
+    }
+
+    if t1.y > t2.y {
+        mem::swap(&mut t1, &mut t2);
+    }; 
+
+    line(t0.x, t0.y, t1.x, t1.y, image, color);
+    line(t1.x, t1.y, t2.x, t2.y, image, color);
+    line(t2.x, t2.y, t0.x, t0.y, image, color);
 }   
 
 fn draw_model(model: model::Model, image: &mut RgbImage, width: u32, height: u32) {
     for face in model.faces {
-        for i in 0..3 {
-            let v0 = model.verts.get(face[i] as usize).unwrap();
-            let v1 = model.verts.get(face[(i + 1) % 3] as usize).unwrap();
-            
-            let x0 = ((v0[0] + 1.0) * width as f32 / 2.0) as i32;
-            let y0 = ((v0[1] + 1.0) * height as f32 / 2.0) as i32;
-            let x1 = ((v1[0] + 1.0) * width as f32 / 2.0) as i32;
-            let y1 = ((v1[1] + 1.0) * height as f32 / 2.0) as i32;
+        let mut screen_coordinates: Vec<Vector2<i32>> = Vec::new();
 
-            line(x0, y0, x1, y1, image, Rgb([255, 255, 255]));
+        for i in 0..3 {
+            let world_coordinates = model.verts.get(face[i] as usize).unwrap();
+
+            screen_coordinates.push(
+                Vector2::new(
+                    ((world_coordinates.x + 1.0) * width as f32 / 2.0) as i32, 
+                    ((world_coordinates.y + 1.0) * height as f32 / 2.0) as i32
+                )
+            );
         }
+
+        triangle(screen_coordinates[0], screen_coordinates[1], screen_coordinates[2], image, white);
     }
 }
 
@@ -62,21 +84,9 @@ fn main() {
     let height: u32 = 800;
 
     let mut image : RgbImage = ImageBuffer::new(width, height);
-
-    let red = Rgb([255, 0, 0]);
-    let white = Rgb([255, 255, 255]);
-    let green = Rgb([0, 255, 0]);
    
     let model = model::Model::from_file("obj/african_head.obj");
     draw_model(model, &mut image, width, height);
-    
-    // let t0 = vec![vec![10, 70], vec![50, 160], vec![70, 80]];
-    // let t1 = vec![vec![180, 50], vec![150, 1], vec![70, 180]];
-    // let t2 = vec![vec![180, 150], vec![120, 160], vec![130, 180]];
-
-    // triangle(&t0[0], &t0[1], &t0[2], &mut image, red); 
-    // triangle(&t1[0], &t1[1], &t1[2], &mut image, white); 
-    // triangle(&t2[0], &t2[1], &t2[2], &mut image, green);
 
     image = flip_vertical(&image);
     
