@@ -1,14 +1,17 @@
 use image::{RgbImage, Rgb, ImageBuffer};
 use image::imageops::{flip_vertical};
-use nalgebra::{Point2};
-use rand::Rng;
+use nalgebra::{Point2, Vector3};
 use std::mem;
+use std::time::{Instant};
 
 mod model;
 
 static WHITE: Rgb<u8> = Rgb([255, 255, 255]);
 static RED: Rgb<u8> = Rgb([255, 0, 0]);
 static GREEN: Rgb<u8> = Rgb([0, 255, 0]);
+
+static WIDTH: u32 = 800;
+static HEIGHT: u32 = 800;
 
 fn line(mut x0: i32, mut y0: i32, mut x1: i32, mut y1: i32, image: &mut RgbImage, color: Rgb<u8>) {
     let mut steep = false;
@@ -96,38 +99,59 @@ fn triangle(mut t0: Point2<i32>, mut t1: Point2<i32>, mut t2: Point2<i32>, image
     }
 }
 
-fn draw_model(model: model::Model, image: &mut RgbImage, width: u32, height: u32) {
+fn draw_model(model: model::Model, image: &mut RgbImage) {
+    let light_direction = Vector3::<f32>::new(1.0, 1.0, 1.0);
+
     for face in model.faces {
         let mut screen_coordinates: Vec<Point2<i32>> = Vec::new();
+        let mut world_coordinates: Vec<Vector3<f32>> = Vec::new();
 
         for i in 0..3 {
-            let world_coordinates = model.verts.get(face[i] as usize).unwrap();
+            let v: Vector3<f32> = model.verts[face[i] as usize];
 
             screen_coordinates.push(
                 Point2::new(
-                    ((world_coordinates.x + 1.0) * width as f32 / 2.0) as i32,
-                    ((world_coordinates.y + 1.0) * height as f32 / 2.0) as i32
+                    ((v.x + 1.0) * WIDTH as f32 / 2.0) as i32,
+                    ((v.y + 1.0) * HEIGHT as f32 / 2.0) as i32
                 )
             );
+
+            world_coordinates.push(v);
         }
 
-        let mut rng = rand::thread_rng();
-        let color =  Rgb([rng.gen::<u8>(), rng.gen::<u8>(), rng.gen::<u8>()]);
+        let v1 = world_coordinates[2] - world_coordinates[0];
+        let v2 = world_coordinates[1] - world_coordinates[0];
+        let n: Vector3<f32> = v2.cross(&v1).normalize();
+ 
+        let intensity: f32 = n.dot(&light_direction);
 
-        triangle(screen_coordinates[0], screen_coordinates[1], screen_coordinates[2], image, color);
+        let color = Rgb([(255.0 * intensity) as u8, (255.0 * intensity) as u8, (255.0 * intensity) as u8]);
+
+        if intensity > 0.0 {
+            triangle(
+                screen_coordinates[0],
+                screen_coordinates[1], 
+                screen_coordinates[2], 
+                image, 
+                color   
+            );
+        }
     }
 }
 
 fn main() {
-    let width: u32 = 800;
-    let height: u32 = 800;
-
-    let mut image: RgbImage = ImageBuffer::new(width, height);
+    let start = Instant::now();
+    
+    let mut image: RgbImage = ImageBuffer::new(WIDTH, HEIGHT);
 
     let model = model::Model::from_file("obj/african_head.obj");
-    draw_model(model, &mut image, width, height);
+    draw_model(model, &mut image);
 
     image = flip_vertical(&image);
 
     image.save("image.png").unwrap();
+
+    let duration = start.elapsed();
+
+    println!("The program executed in {:?}", duration);
 }

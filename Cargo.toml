@@ -10,4 +10,4 @@ nalgebra = "0.20"
 rand = "0.8.2"
 
 [build]
-rustflags = ["dead_code"]
+rustc-flags = "-A dead_code"
