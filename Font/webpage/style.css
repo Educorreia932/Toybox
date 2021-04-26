@@ -1,6 +1,6 @@
 @font-face {
     font-family: "Bad Apple";
-    src: url("/out/bad_apple.woff") format('woff')
+    src: url("../out/bad_apple.woff") format('woff')
 }
 
 body {
