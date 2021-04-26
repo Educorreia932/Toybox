@@ -13,7 +13,7 @@ def generate_frames():
 
         success, image = vidcap.read()
 
-        count += 1
+        count += 1 / 30
 
 if __name__ == "__main__":
     generate_frames()

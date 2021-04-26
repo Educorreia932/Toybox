@@ -21,6 +21,9 @@ let frame_number = 0;
 function update_frame() {
     document.getElementById("animation").innerText = frames[frame_number];
     frame_number += 1;
+
+    if (frame_number == frames.length)
+        clearInterval(t); 
 }
 
 let FRAME_RATE = 30;
