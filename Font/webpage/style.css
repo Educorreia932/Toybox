@@ -1,0 +1,15 @@
+@font-face {
+    font-family: "Bad Apple";
+    src: url("/out/bad_apple.woff") format('woff')
+}
+
+body {
+    font-family: "Bad Apple";
+    font-size: 40em;
+    word-wrap: break-word;
+}
+
+#animation {
+    margin: 0;
+    text-align: center;
+}
