@@ -1,0 +1,41 @@
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+/SFML-2.5.1
+/x64/Release
+/.vs/StringArt/v16
+/StringArt.vcxproj.user
+/StringArt.vcxproj.filters
+/StringArt.vcxproj
+/StringArt.sln
+/Debug
+*.jpg
