@@ -1,4 +1,5 @@
-# Raspberry Clock
-A simple Raspberry Pi clock made with Tkinter.
+# Raspberry Pi Clock
 
-![Clock figure](figure.png)
+![](figure.png)
+
+A simple clock made with Tkinter. Its purpose was to be displayed on a Raspberry Pi using a LCD screen.

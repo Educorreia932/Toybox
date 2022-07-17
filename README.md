@@ -1,2 +1,5 @@
-# Toybox
-Collection of toy programs I developed
+<p align="center">
+    <img src="toybox.png">
+</p>
+
+Collection of toy programs or otherwise computational apparatus I've developed.
